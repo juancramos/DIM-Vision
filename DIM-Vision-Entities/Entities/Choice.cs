@@ -4,13 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DIM_Vision
+namespace DIM_Vision_Entities.Entities
 {
-    class Program
+    public class Choice
     {
-        static void Main(string[] args)
-        {
-
-        }
     }
 }
