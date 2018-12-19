@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DIM_Vision_ClassLibrary;
+using System;
 
 namespace DIM_Vision
 {
@@ -10,7 +7,12 @@ namespace DIM_Vision
     {
         static void Main(string[] args)
         {
-
+            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "./key.json");
+            ScreenCapture sc = new ScreenCapture();
+            // CloudVision.VisionUseGoogle(sc.CaptureScreen());
+            CloudVision.VisionUserCognitive(sc.CaptureScreen());
         }
     }
 }
+
+
