@@ -1,4 +1,5 @@
-﻿using Google.Cloud.Vision.V1;
+﻿using DIM_Vision_Cross;
+using Google.Cloud.Vision.V1;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 using System;
@@ -22,7 +23,7 @@ namespace DIM_Vision_ClassLibrary
 
         public static void VisionUseGoogle(System.Drawing.Image img)
         {
-
+            Environment.SetEnvironmentVariable(VisionConstants.GoogleAppKey, ConfigurationManager.AppSettings.Get(VisionConstants.GoogleAppCredentials));
             using (MemoryStream memStream = new MemoryStream())
             {
                 img.Save(memStream, System.Drawing.Imaging.ImageFormat.Jpeg);
@@ -37,7 +38,7 @@ namespace DIM_Vision_ClassLibrary
 
         public static void VisionUserCognitive(System.Drawing.Image img)
         {
-            string subscriptionKey = ConfigurationManager.AppSettings.Get("AzureVisionKey");
+            string subscriptionKey = ConfigurationManager.AppSettings.Get(VisionConstants.AzureVisionKey);
             ComputerVisionClient computerVision = new ComputerVisionClient(
                     new ApiKeyServiceClientCredentials(subscriptionKey),
                     new System.Net.Http.DelegatingHandler[] { });
@@ -51,7 +52,7 @@ namespace DIM_Vision_ClassLibrary
             // need to change the region.
 
             // Specify the Azure region
-            computerVision.Endpoint = "https://eastus.api.cognitive.microsoft.com/";
+            computerVision.Endpoint = ConfigurationManager.AppSettings.Get(VisionConstants.AzureVisionApi);
 
             Console.WriteLine("Images being analyzed ...");
             var t1 = ExtractRemoteTextAsync(computerVision, remoteImageUrl);
@@ -135,20 +136,5 @@ namespace DIM_Vision_ClassLibrary
             }
             Console.WriteLine();
         }
-
-        //public static PerformGoogleVision()
-        //{
-        //    var client = ImageAnnotatorClient.Create();
-        //    var image = System.Drawing.Image.FromStream("gs://cloud-vision-codelab/otter_crossing.jpg");
-        //    var response = client.DetectText(image);
-        //    foreach (var annotation in response)
-        //    {
-        //        if (annotation.Description != null)
-        //        {
-        //            Console.WriteLine(annotation.Description);
-        //        }
-        //    }
-        //}
-
     }
 }
