@@ -31,24 +31,16 @@ namespace DIM_Vision_Data.DataAccess
                     Value = "Vísion"
                 }
             );
-            Guid gcId = Guid.NewGuid();
             Guid gc1Id = Guid.NewGuid();
+            Guid gc2Id = Guid.NewGuid();
             modelBuilder.Entity<Choice>().HasData(
-                new Choice
-                {
-                    Id = gcId,
-                    GrammarId = gId,
-                    Order = (int)decimal.Zero,
-                    Name = "Vísion",
-                    Value = "Vísion"
-                },
                 new Choice
                 {
                     Id = gc1Id,
                     GrammarId = gId,
                     Order = (int)decimal.Zero,
                     Name = "que",
-                    Value = "que"
+                    Value = "metodo"
                 },
                 new Choice
                 {
@@ -74,6 +66,23 @@ namespace DIM_Vision_Data.DataAccess
                     GrammarId = gId,
                     Order = (int)decimal.One,
                     Name = "esta abierto",
+                    Value = "GetRunningApps",
+                    CboiceType = ChoiceType.SemanticResultValue
+                },
+                new Choice
+                {
+                    Id = gc2Id,
+                    GrammarId = gId,
+                    Order = (int)decimal.Zero,
+                    Name = "dime",
+                    Value = "metodo"
+                },
+                new Choice
+                {
+                    ParentId = gc2Id,
+                    GrammarId = gId,
+                    Order = (int)decimal.One,
+                    Name = "aplicaciones abiertas",
                     Value = "GetRunningApps",
                     CboiceType = ChoiceType.SemanticResultValue
                 }

@@ -27,7 +27,7 @@ namespace DIM_Vision_ClassLibrary
             {
                 _recognizer.UpdateRecognizerSetting(VisionConstants.GrammasSettings[0], 60);
                 _recognizer.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(_recognizerHandler);
-                _recognizer.SpeechRecognitionRejected += _recognizerHandlerRejected;
+                // _recognizer.SpeechRecognitionRejected += _recognizerHandlerRejected;
                 _recognizer.RecognizeAsync(RecognizeMode.Multiple);
             }
             //synth.Speak("Ahora puedo ayudar.");
@@ -44,19 +44,23 @@ namespace DIM_Vision_ClassLibrary
                     {
                         if (item.Choices.Any())
                         {
-
+                            GrammarBuilder bg = new GrammarBuilder(item.Name);
                             string[] c = item.Choices.Where(x => !x.EmbeddedChoices.Any() && x.CboiceType == ChoiceType.None).OrderBy(x => x.Order).Select(x => x.Name).ToArray();
-                            GrammarBuilder bg = c.Any() ? new GrammarBuilder(new Choices(c)) : new GrammarBuilder();
+                            if (c.Any()) bg.Append(new Choices(c));
 
-                            foreach (var e in item.Choices.Where(x => x.EmbeddedChoices.Any() && x.CboiceType == ChoiceType.None))
+                            foreach (IGrouping<int, DIM_Vision_Entities.Entities.Choice> e in item.Choices.Where(x => x.EmbeddedChoices.Any() && x.CboiceType == ChoiceType.None).GroupBy(x => x.Order))
                             {
-                                Choices lChoices = e.EmbeddedChoices.Any() ? new Choices() : null;
-                                bg.Append(new GrammarBuilder(new Choices(e.Name)));
-                                foreach (var ec in e.EmbeddedChoices)
+                                bg.Append(new GrammarBuilder(new Choices(e.OrderBy(x => x.Order).Select(x => x.Name).ToArray())));
+                                string tag = e.OrderBy(x => x.Order).Select(x => x.Value).FirstOrDefault();
+                                var em = e.OrderBy(x => x.Order).SelectMany(x => x.EmbeddedChoices);
+
+                                Choices lChoices = new Choices();
+                                foreach (var ec in em)
                                 {
                                     lChoices.Add(new GrammarBuilder(new SemanticResultValue(ec.Name, ec.Value)));
                                 }
-                                if (lChoices != null) bg.Append(new GrammarBuilder(new SemanticResultKey(e.Name, lChoices)));
+                                if (lChoices != null)
+                                    bg.Append(new GrammarBuilder(new SemanticResultKey(tag, lChoices)));
                             }
 
                             _recognizer.LoadGrammar(new Grammar(bg) { Name = item.Name, Enabled = true, Priority = item.Order });
@@ -101,9 +105,9 @@ namespace DIM_Vision_ClassLibrary
                 else
                 {
                     SemanticValue semantics = e.Result.Semantics;
-                    if (semantics.Any(y => context.Choices.Any(x => x.Name.Equals(y.Key))))
+                    if (semantics.Any(y => context.Choices.Any(x => x.Value.Equals(y.Key))))
                     {
-                        var sem = semantics.FirstOrDefault(y => context.Choices.Any(x => x.Name.Equals(y.Key)));
+                        var sem = semantics.FirstOrDefault(y => context.Choices.Any(x => x.Value.Equals(y.Key)));
                         MethodInfo met = typeof(WindowsInteraction).GetMethod(sem.Value.Value.ToString());
                         if (met != null)
                         {
@@ -119,7 +123,6 @@ namespace DIM_Vision_ClassLibrary
 
         private static void _recognizerHandlerRejected(object sender, SpeechRecognitionRejectedEventArgs e)
         {
-            _recognizer.RecognizeAsyncStop();
             if (e.Result.Alternates.Count == 0)
             {
                 synth.Speak("No te he entendido. Intentalo de nuevo.");
@@ -138,7 +141,6 @@ namespace DIM_Vision_ClassLibrary
                     synth.Speak($"      {r.Text},");
                 }
             }
-            _recognizer.RecognizeAsync(RecognizeMode.Multiple);
         }
     }
 }
