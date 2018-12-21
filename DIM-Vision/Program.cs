@@ -1,4 +1,5 @@
 ﻿using DIM_Vision_ClassLibrary;
+using System;
 
 namespace DIM_Vision
 {
@@ -6,9 +7,8 @@ namespace DIM_Vision
     {
         static void Main(string[] args)
         {
-            ScreenCapture sc = new ScreenCapture();
-            // CloudVision.VisionUseGoogle(sc.CaptureScreen());
-            CloudVision.VisionUserCognitive(sc.CaptureScreen());
+            Vision main = new Vision();
+            Console.ReadLine();
         }
     }
 }

@@ -23,7 +23,8 @@ namespace DIM_Vision_ClassLibrary
 
         public static void VisionUseGoogle(System.Drawing.Image img)
         {
-            Environment.SetEnvironmentVariable(VisionConstants.GoogleAppKey, ConfigurationManager.AppSettings.Get(VisionConstants.GoogleAppCredentials));
+            string p = $"{Environment.CurrentDirectory}{ConfigurationManager.AppSettings.Get(VisionConstants.GoogleAppCredentials)}";
+            Environment.SetEnvironmentVariable(VisionConstants.GoogleAppKey, p);
             using (MemoryStream memStream = new MemoryStream())
             {
                 img.Save(memStream, System.Drawing.Imaging.ImageFormat.Jpeg);
@@ -41,18 +42,20 @@ namespace DIM_Vision_ClassLibrary
             string subscriptionKey = ConfigurationManager.AppSettings.Get(VisionConstants.AzureVisionKey);
             ComputerVisionClient computerVision = new ComputerVisionClient(
                     new ApiKeyServiceClientCredentials(subscriptionKey),
-                    new System.Net.Http.DelegatingHandler[] { });
+                    new System.Net.Http.DelegatingHandler[] { })
+            {
 
-            // You must use the same region as you used to get your subscription
-            // keys. For example, if you got your subscription keys from westus,
-            // replace "westcentralus" with "westus".
-            //
-            // Free trial subscription keys are generated in the "westus"
-            // region. If you use a free trial subscription key, you shouldn't
-            // need to change the region.
+                // You must use the same region as you used to get your subscription
+                // keys. For example, if you got your subscription keys from westus,
+                // replace "westcentralus" with "westus".
+                //
+                // Free trial subscription keys are generated in the "westus"
+                // region. If you use a free trial subscription key, you shouldn't
+                // need to change the region.
 
-            // Specify the Azure region
-            computerVision.Endpoint = ConfigurationManager.AppSettings.Get(VisionConstants.AzureVisionApi);
+                // Specify the Azure region
+                Endpoint = ConfigurationManager.AppSettings.Get(VisionConstants.AzureVisionApi)
+            };
 
             Console.WriteLine("Images being analyzed ...");
             var t1 = ExtractRemoteTextAsync(computerVision, remoteImageUrl);
